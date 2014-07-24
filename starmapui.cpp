@@ -25,6 +25,13 @@ StarMapUI::StarMapUI(QWidget *parent) :
     ui->mapDisplay->setMouseTracking(true);
     ui->starTypeLabel->setText("");
     ui->starSizeLabel->setText("");
+    ui->planetOneLabel->setText("");
+    ui->planetTwoLabel->setText("");
+    ui->planetThreeLabel->setText("");
+    ui->planetFourLabel->setText("");
+    ui->planetFiveLabel->setText("");
+    //ui->menuBar->setStyleSheet("background-color:black;foregroun");
+  //  ui->menuFile->setStyleSheet();
     setMouseTracking(true);
 
     starItem = new QGraphicsPixmapItem (QPixmap("../starmap-ui/starpics/nostar.png"));
