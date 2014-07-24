@@ -27,6 +27,10 @@ StarMapUI::StarMapUI(QWidget *parent) :
     ui->starSizeLabel->setText("");
     setMouseTracking(true);
 
+    starItem = new QGraphicsPixmapItem (QPixmap("../starmap-ui/starpics/nostar.png"));
+    starScene = new QGraphicsScene;
+    starScene->addItem(starItem);
+
     count = 0;
 
 }
@@ -123,33 +127,37 @@ bool StarMapUI::eventFilter(QObject *obj, QEvent *event){
         qDebug() << "(" << mouseEvent->x() << "," << mouseEvent->y() << ")";
 
         qDebug() << " => (" << mouseEvent->x()/4 << "," << mouseEvent->y()/4 << ")";
-        QString sizeString, typeString;
+        QString sizeString, typeString,imageString;
         if (star==nullptr){
             sizeString="";
             typeString="";
+            imageString="../starmap-ui/starpics/nostar.png";
         }
         else{
-            switch (star->getType()){
+            sizeString = QString::fromStdString(star->getSizeString());
+            typeString = QString::fromStdString(star->getTypeString());
+            imageString = "../starmap-ui/starpics/" + typeString.toLower() + sizeString.toLower() + ".png";
+        /*    switch (star->getType()){
                 case TYPE_RED:
-                        typeString = "RED ";
+                        typeString = "RED";
                         break;
                 case TYPE_YELLOW:
-                        typeString = "YELLOW ";
+                        typeString = "YELLOW";
                         break;
                 case TYPE_ORANGE:
-                        typeString = "ORANGE ";
+                        typeString = "ORANGE";
                         break;
                 case TYPE_WHITE:
-                        typeString = "WHITE ";
+                        typeString = "WHITE";
                         break;
                 case TYPE_BLUE:
-                        typeString = "BLUE ";
+                        typeString = "BLUE";
                         break;
                 case TYPE_BLUEWHITE:
-                        typeString = "BLUE-WHITE ";
+                        typeString = "BLUE-WHITE";
                         break;
                 case TYPE_BLUEVIOLET:
-                        typeString = "BLUE-VIOLET ";
+                        typeString = "BLUE-VIOLET";
             }
             switch (star->getSize()){
                 case DWARF:
@@ -161,10 +169,13 @@ bool StarMapUI::eventFilter(QObject *obj, QEvent *event){
                 case SUPERGIANT:
                     sizeString += "SUPERGIANT";
                     break;
-            }
+            }*/
         }
+        qDebug() << imageString;
         ui->starTypeLabel->setText(typeString);
         ui->starSizeLabel->setText(sizeString);
+        starItem->setPixmap(QPixmap(imageString));
+        ui->starDisplay->setScene(starScene);
     }
     return false;
 }

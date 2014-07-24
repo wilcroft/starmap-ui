@@ -26,3 +26,20 @@ HEADERS  += starmapui.h \
     mappixmapitem.h
 
 FORMS    += starmapui.ui
+
+OTHER_FILES += \
+    starpics/bluedwarf.png \
+    starpics/bluegiant.png \
+    starpics/bluesupergiant.png \
+    starpics/blue-violetdwarf.png \
+    starpics/blue-violetgiant.png \
+    starpics/blue-violetsupergiant.png \
+    starpics/blue-whitedwarf.png \
+    starpics/nostar.png \
+    starpics/orangedwarf.png \
+    starpics/reddwarf.png \
+    starpics/redgiant.png \
+    starpics/redsupergiant.png \
+    starpics/whitedwarf.png \
+    starpics/yellowdwarf.png \
+    starpics/yellowsupergiant.png

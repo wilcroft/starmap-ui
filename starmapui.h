@@ -87,6 +87,9 @@ private:
     QGraphicsPixmapItem* mapItem;
     QGraphicsView* mapView;
 
+    QGraphicsScene* starScene;
+    QGraphicsPixmapItem* starItem;
+
     Map* starMap;
     bool mapExists;
     int count;

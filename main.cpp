@@ -1,3 +1,4 @@
+#define ISCLI 0
 #include "starmapui.h"
 #include <QApplication>
 

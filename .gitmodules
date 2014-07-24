@@ -1,0 +1,3 @@
+[submodule "cli_tools"]
+	path = cli_tools
+	url = ../../v2/starmap-cli/
