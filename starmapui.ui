@@ -158,6 +158,9 @@ color: white;
     <property name="text">
      <string>GAS GIANT</string>
     </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QGraphicsView" name="planetOneView">
     <property name="geometry">
@@ -220,6 +223,9 @@ color: white;
     <property name="text">
      <string>ARID DESERT</string>
     </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QLabel" name="planetThreeLabel">
     <property name="geometry">
@@ -238,6 +244,9 @@ color: white;
     </property>
     <property name="text">
      <string>OCEANIC</string>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="planetFourLabel">
@@ -258,6 +267,9 @@ color: white;
     <property name="text">
      <string>BARREN</string>
     </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QLabel" name="planetFiveLabel">
     <property name="geometry">
@@ -272,10 +284,14 @@ color: white;
      <font>
       <family>Lucida Console</family>
       <pointsize>16</pointsize>
+      <kerning>true</kerning>
      </font>
     </property>
     <property name="text">
-     <string>EARTH-LIKE</string>
+     <string>LARGE EARTHLIKE</string>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QGraphicsView" name="planetTwoView">

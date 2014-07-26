@@ -23,22 +23,34 @@ StarMapUI::StarMapUI(QWidget *parent) :
 
  //   ui->mapDisplay->setScene(mapScene);
     ui->mapDisplay->setMouseTracking(true);
-    ui->starTypeLabel->setText("");
-    ui->starSizeLabel->setText("");
-    ui->planetOneLabel->setText("");
-    ui->planetTwoLabel->setText("");
-    ui->planetThreeLabel->setText("");
-    ui->planetFourLabel->setText("");
-    ui->planetFiveLabel->setText("");
-    //ui->menuBar->setStyleSheet("background-color:black;foregroun");
-  //  ui->menuFile->setStyleSheet();
+
+//Assign planet labels and views to an array for easy access!
+    planetLabelPtr[0]=ui->planetOneLabel;
+    planetLabelPtr[1]=ui->planetTwoLabel;
+    planetLabelPtr[2]=ui->planetThreeLabel;
+    planetLabelPtr[3]=ui->planetFourLabel;
+    planetLabelPtr[4]=ui->planetFiveLabel;
+
+    planetViewPtr[0]=ui->planetOneView;
+    planetViewPtr[1]=ui->planetTwoView;
+    planetViewPtr[2]=ui->planetThreeView;
+    planetViewPtr[3]=ui->planetFourView;
+    planetViewPtr[4]=ui->planetFiveView;
+
     setMouseTracking(true);
 
-    starItem = new QGraphicsPixmapItem (QPixmap("../starmap-ui/starpics/nostar.png"));
+    starItem = new QGraphicsPixmapItem;
     starScene = new QGraphicsScene;
     starScene->addItem(starItem);
 
+    for (int i=0;i<5;i++){
+        planetItem[i]=new QGraphicsPixmapItem;
+        planetScene[i]= new QGraphicsScene;
+        planetScene[i]->addItem(planetItem[i]);
+    }
+
     count = 0;
+    this->clearSidebar();
 
 }
 
@@ -55,6 +67,7 @@ StarMapUI::~StarMapUI()
 void StarMapUI::newMap()
 {
     qDebug() << "New!";
+    QString newTitle;
 
     if (mapExists){
         delete starMap;
@@ -68,11 +81,15 @@ void StarMapUI::newMap()
     ui->mapDisplay->setScene(mapScene);
 
     mapExists = true;
+    newTitle = QString("StarMapUI (%1)").arg(starMap->getMapSeed());
+    this->setWindowTitle(newTitle);
+    this->clearSidebar();
 }
 
 void StarMapUI::openMap()
 {
     bool ok;
+    QString newTitle;
     int seed = QInputDialog::getInt(this, tr("Open Seed..."),tr("Seed:"), 0,
                                    -2147483647,2147483647,1,&ok);
     qDebug() << "Open!" << seed;
@@ -88,6 +105,9 @@ void StarMapUI::openMap()
         ui->mapDisplay->setScene(mapScene);
 
         mapExists = true;
+        newTitle = QString("StarMapUI (%1)").arg(seed);
+        this->setWindowTitle(newTitle);
+        this->clearSidebar();
 
 
     }
@@ -135,15 +155,31 @@ bool StarMapUI::eventFilter(QObject *obj, QEvent *event){
 
         qDebug() << " => (" << mouseEvent->x()/4 << "," << mouseEvent->y()/4 << ")";
         QString sizeString, typeString,imageString;
+        QString planetString[5];
+        QString planetImageString[5];
         if (star==nullptr){
             sizeString="";
             typeString="";
-            imageString="../starmap-ui/starpics/nostar.png";
+            imageString="starpics/nostar.png";
+            for (int i=0;i<5;i++){
+                planetString[i]="";
+                planetImageString[i]="starpics/noplanet.png";
+            }
         }
         else{
             sizeString = QString::fromStdString(star->getSizeString());
             typeString = QString::fromStdString(star->getTypeString());
-            imageString = "../starmap-ui/starpics/" + typeString.toLower() + sizeString.toLower() + ".png";
+            imageString = "starpics/" + typeString.toLower() + sizeString.toLower() + ".png";
+            for (int i=0;i<5;i++){
+                planetString[i]=QString::fromStdString(star->getPlanetString(i));
+                if (star->getPlanetType(i)==PLANETTYPE_NOPLANET)
+                    planetImageString[i]="starpics/noplanet.png";
+                else if (star->getPlanetType(i)==PLANETTYPE_GAS)
+                    planetImageString[i]="starpics/gasgiant.png";
+                else
+                    planetImageString[i]="starpics/" + QString::fromStdString(star->getPlanetSizeString(i)).toLower()
+                            + QString::fromStdString(star->getPlanetBiomeString(i)).toLower() + ".png";
+            }
         /*    switch (star->getType()){
                 case TYPE_RED:
                         typeString = "RED";
@@ -183,6 +219,54 @@ bool StarMapUI::eventFilter(QObject *obj, QEvent *event){
         ui->starSizeLabel->setText(sizeString);
         starItem->setPixmap(QPixmap(imageString));
         ui->starDisplay->setScene(starScene);
+
+        for (int i=0; i<5;i++){
+            //planetLabelPtr[i]->setText(planetString[i]);
+            this->setScaledText(planetLabelPtr[i], planetString[i]);
+            planetItem[i]->setPixmap(QPixmap(planetImageString[i]));
+            planetViewPtr[i]->setScene(planetScene[i]);
+        }
+
     }
     return false;
+}
+
+void StarMapUI::setScaledText(QLabel* label, QString text, int maxpt){
+    QString fontString;
+    
+    double length=label->width()+1;
+    int pt;
+    //int pt=label->font().pointSize()+1;
+    if (maxpt==0)
+        pt=label->font().pointSize()+1;
+    else
+        pt=maxpt+1;
+    fontString=label->font().family();
+    qDebug() << text << ":" << length << " @ " << pt-1;
+    while (length>label->width()-5){
+        pt--; //start with i=default
+        QFont font (fontString, pt);
+        QFontMetricsF fm(font);
+    //    length = fm.width(text);
+        length = fm.maxWidth()*(text.length()+1);
+        qDebug() << "\tAt " << pt << " pt, length is " << length << "(" << fm.maxWidth() << "/char)";
+        qDebug() << fm.boundingRect(text).width();
+    }
+    QFont newFont = label->font();
+    newFont.setPointSize(pt);
+    label->setFont(newFont);
+    label->setText(text);
+}
+void StarMapUI::clearSidebar(){
+    ui->starTypeLabel->setText("");
+    ui->starSizeLabel->setText("");
+    starItem->setPixmap(QPixmap("starpics/nostar.png"));
+    ui->starDisplay->setScene(starScene);
+
+    for (int i=0; i<5;i++){
+        this->setScaledText(planetLabelPtr[i], "");
+        planetItem[i]->setPixmap(QPixmap("starpics/noplanet.png"));
+        planetViewPtr[i]->setScene(planetScene[i]);
+    }
+
 }

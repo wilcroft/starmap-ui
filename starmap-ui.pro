@@ -17,13 +17,16 @@ SOURCES += main.cpp\
         starmapui.cpp \
     cli_tools/map.cpp \
     cli_tools/star.cpp \
-    mappixmapitem.cpp
+    mappixmapitem.cpp \
+    cli_tools/planet.cpp
 
 HEADERS  += starmapui.h \
     cli_tools/map.h \
     cli_tools/star.h \
     cli_tools/util.h \
-    mappixmapitem.h
+    mappixmapitem.h \
+    cli_tools/planet.h \
+    cli_tools/startype.h
 
 FORMS    += starmapui.ui
 
