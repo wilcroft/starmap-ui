@@ -1,0 +1,3 @@
+[submodule "cli_tools"]
+	path = cli_tools
+	url = https://github.com/wilcroft/starmap-cli.git
