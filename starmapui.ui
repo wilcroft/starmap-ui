@@ -45,8 +45,8 @@ color: white;
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>800</width>
-      <height>800</height>
+      <width>750</width>
+      <height>750</height>
      </rect>
     </property>
     <property name="sizePolicy">

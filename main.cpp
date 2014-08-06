@@ -2,6 +2,8 @@
 #include "starmapui.h"
 #include <QApplication>
 
+int userDim;
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
