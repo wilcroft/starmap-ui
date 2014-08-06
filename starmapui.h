@@ -13,6 +13,8 @@
 #include <QString>
 #include <QFontMetrics>
 #include <QFontMetricsF>
+#include <QBrush>
+#include <QPen>
 
 #include "cli_tools/map.h"
 #include "cli_tools/star.h"
@@ -34,6 +36,7 @@ protected:
     bool eventFilter(QObject *, QEvent *);
     void setScaledText(QLabel* label, QString text, int maxpt=16);
     void clearSidebar();
+    void addPlayerMarkers();
 
 private slots:
     void newMap();

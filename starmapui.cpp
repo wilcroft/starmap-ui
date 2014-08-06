@@ -73,8 +73,8 @@ void StarMapUI::newMap()
         delete starMap;
         delete mapItem;
     }
-
-    starMap = new Map(200,200);
+    userDim = ui->mapDisplay->width();
+    starMap = new Map(150,150);
     mapItem = new QGraphicsPixmapItem(QPixmap("output.png"));
     mapScene->addItem(mapItem);
 
@@ -84,6 +84,8 @@ void StarMapUI::newMap()
     newTitle = QString("StarMapUI (%1)").arg(starMap->getMapSeed());
     this->setWindowTitle(newTitle);
     this->clearSidebar();
+
+    addPlayerMarkers();
 }
 
 void StarMapUI::openMap()
@@ -98,7 +100,8 @@ void StarMapUI::openMap()
             delete starMap;
             delete mapItem;
         }
-        starMap = new Map(200,200, seed);
+        userDim = ui->mapDisplay->width();
+        starMap = new Map(150,150, seed);
         mapItem = new QGraphicsPixmapItem(QPixmap("output.png"));
         mapScene->addItem(mapItem);
 
@@ -109,7 +112,7 @@ void StarMapUI::openMap()
         this->setWindowTitle(newTitle);
         this->clearSidebar();
 
-
+        addPlayerMarkers();
     }
 }
 
@@ -148,12 +151,14 @@ bool StarMapUI::eventFilter(QObject *obj, QEvent *event){
 //        if (obj==ui->mapDisplay)
 //            qDebug() << "SAME";
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+        int mx = mouseEvent->x();
+        int my = mouseEvent->y();
         //QString labelString=QString("(%1,%2)").arg(QString::number(mouseEvent->x()),
         //                                           QString::number(mouseEvent->y()));
-        Star* star = starMap->getStar(mouseEvent->x()/4,mouseEvent->y()/4);
-        qDebug() << "(" << mouseEvent->x() << "," << mouseEvent->y() << ")";
+        Star* star = starMap->getStar(mx/5,my/5);
+        qDebug() << "(" << mx << "," << my << ")";
 
-        qDebug() << " => (" << mouseEvent->x()/4 << "," << mouseEvent->y()/4 << ")";
+        qDebug() << " => (" << mx/5 << "," << my/5 << ")";
         QString sizeString, typeString,imageString;
         QString planetString[5];
         QString planetImageString[5];
@@ -180,39 +185,6 @@ bool StarMapUI::eventFilter(QObject *obj, QEvent *event){
                     planetImageString[i]="starpics/" + QString::fromStdString(star->getPlanetSizeString(i)).toLower()
                             + QString::fromStdString(star->getPlanetBiomeString(i)).toLower() + ".png";
             }
-        /*    switch (star->getType()){
-                case TYPE_RED:
-                        typeString = "RED";
-                        break;
-                case TYPE_YELLOW:
-                        typeString = "YELLOW";
-                        break;
-                case TYPE_ORANGE:
-                        typeString = "ORANGE";
-                        break;
-                case TYPE_WHITE:
-                        typeString = "WHITE";
-                        break;
-                case TYPE_BLUE:
-                        typeString = "BLUE";
-                        break;
-                case TYPE_BLUEWHITE:
-                        typeString = "BLUE-WHITE";
-                        break;
-                case TYPE_BLUEVIOLET:
-                        typeString = "BLUE-VIOLET";
-            }
-            switch (star->getSize()){
-                case DWARF:
-                    sizeString += "DWARF";
-                    break;
-                case GIANT:
-                    sizeString += "GIANT";
-                    break;
-                case SUPERGIANT:
-                    sizeString += "SUPERGIANT";
-                    break;
-            }*/
         }
         qDebug() << imageString;
         ui->starTypeLabel->setText(typeString);
@@ -225,8 +197,27 @@ bool StarMapUI::eventFilter(QObject *obj, QEvent *event){
             this->setScaledText(planetLabelPtr[i], planetString[i]);
             planetItem[i]->setPixmap(QPixmap(planetImageString[i]));
             planetViewPtr[i]->setScene(planetScene[i]);
-        }
-
+        }/*
+        if (star!=nullptr){
+            while (starMap->getStar(mx/5-1,my/5)==star){
+                mx-=5;
+            }
+            while (starMap->getStar(mx/5,my/5-1)==star){
+                my-=5;
+            }
+            star = starMap->getStar(mx/5,my/5);
+            star->setOwner(STARMAPPLAYER_ONE);
+            rgb_t pcolor = getPlayerColor(star->getOwner());
+            QPen pen(QColor::fromRgb(pcolor.r,pcolor.g,pcolor.b));
+            pen.setWidth(1);
+            int rx,ry,rw,rh;
+            rx=mx-(mx%5)-2;
+            ry=my-(my%5)-2;
+            qDebug() << mouseEvent->x() << " to " << rx;
+            qDebug() << mouseEvent->y() << " to " << ry;
+            rw = rh = 3+5*((int)star->getSize());
+            mapScene->addRect(rx,ry,rw,rh,pen,Qt::NoBrush);
+        }*/
     }
     return false;
 }
@@ -249,8 +240,8 @@ void StarMapUI::setScaledText(QLabel* label, QString text, int maxpt){
         QFontMetricsF fm(font);
     //    length = fm.width(text);
         length = fm.maxWidth()*(text.length()+1);
-        qDebug() << "\tAt " << pt << " pt, length is " << length << "(" << fm.maxWidth() << "/char)";
-        qDebug() << fm.boundingRect(text).width();
+  //      qDebug() << "\tAt " << pt << " pt, length is " << length << "(" << fm.maxWidth() << "/char)";
+ //       qDebug() << fm.boundingRect(text).width();
     }
     QFont newFont = label->font();
     newFont.setPointSize(pt);
@@ -267,6 +258,51 @@ void StarMapUI::clearSidebar(){
         this->setScaledText(planetLabelPtr[i], "");
         planetItem[i]->setPixmap(QPixmap("starpics/noplanet.png"));
         planetViewPtr[i]->setScene(planetScene[i]);
+    }
+
+}
+
+void StarMapUI::addPlayerMarkers(){
+    starMap->starListIterator=starMap->begin();
+    QPen pen;
+    pen.setWidth(1);
+    int i=0;
+    while (starMap->starListIterator!= starMap->end()){
+        int ptx, pty, w, h;
+        ptx=(*(starMap->starListIterator))->getX()*5-2;
+        pty=(*(starMap->starListIterator))->getY()*5-2;
+        rgb_t pcolor = getPlayerColor((*(starMap->starListIterator))->getOwner());
+        pen.setColor(QColor::fromRgb(pcolor.r,pcolor.g,pcolor.b));
+ //       qDebug() << mouseEvent->x() << " to " << rx;
+//        qDebug() << mouseEvent->y() << " to " << ry;
+        w = h = 3+5*((int)(*(starMap->starListIterator))->getSize());
+//        mapScene->addRect(ptx,pty,w,h,pen,Qt::NoBrush);
+        if ((*(starMap->starListIterator))->getSize()==DWARF){
+            mapScene->addLine(ptx, pty, ptx+1, pty, pen);
+            mapScene->addLine(ptx, pty, ptx, pty+1, pen);
+            mapScene->addLine(ptx+w, pty, ptx+w-1, pty, pen);
+            mapScene->addLine(ptx+w, pty, ptx+w, pty+1, pen);
+            mapScene->addLine(ptx, pty+h, ptx+1, pty+h, pen);
+            mapScene->addLine(ptx, pty+h, ptx, pty+h-1, pen);
+            mapScene->addLine(ptx+w, pty+h, ptx+w-1, pty+h, pen);
+            mapScene->addLine(ptx+w, pty+h, ptx+w, pty+h-1, pen);
+        }
+        else{
+            mapScene->addLine(ptx, pty, ptx+2, pty, pen);
+            mapScene->addLine(ptx, pty, ptx, pty+2, pen);
+            mapScene->addLine(ptx+w, pty, ptx+w-2, pty, pen);
+            mapScene->addLine(ptx+w, pty, ptx+w, pty+2, pen);
+            mapScene->addLine(ptx, pty+h, ptx+2, pty+h, pen);
+            mapScene->addLine(ptx, pty+h, ptx, pty+h-2, pen);
+            mapScene->addLine(ptx+w, pty+h, ptx+w-2, pty+h, pen);
+            mapScene->addLine(ptx+w, pty+h, ptx+w, pty+h-2, pen);
+        }
+/*        mapScene->addLine(ptx+1, pty+1, ptx, pty+2, pen);
+        mapScene->addLine(ptx, pty+h-1, ptx+1, pty+h, pen);
+        mapScene->addLine(ptx+h, pty+h, ptx+h-1, pty+h+1, pen);
+        mapScene->addLine(ptx+h-1, pty, ptx+h, pty+1, pen);*/
+        qDebug() << i++;
+        starMap->starListIterator++;
     }
 
 }
