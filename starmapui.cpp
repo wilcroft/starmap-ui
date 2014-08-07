@@ -17,7 +17,8 @@ StarMapUI::StarMapUI(QWidget *parent) :
     mapExists = false;
 
     mapScene = new QGraphicsScene;
-   // mapItem = new QGraphicsPixmapItem(QPixmap("output.png"));
+
+    mapFont.setFamily("Courier");
 
  //   mapScene->addItem(mapItem);
 
@@ -187,8 +188,8 @@ bool StarMapUI::eventFilter(QObject *obj, QEvent *event){
             }
         }
         qDebug() << imageString;
-        ui->starTypeLabel->setText(typeString);
-        ui->starSizeLabel->setText(sizeString);
+        this->setScaledText(ui->starTypeLabel,typeString,30);
+        this->setScaledText(ui->starSizeLabel,sizeString,30);
         starItem->setPixmap(QPixmap(imageString));
         ui->starDisplay->setScene(starScene);
 
@@ -232,7 +233,8 @@ void StarMapUI::setScaledText(QLabel* label, QString text, int maxpt){
         pt=label->font().pointSize()+1;
     else
         pt=maxpt+1;
-    fontString=label->font().family();
+    //fontString=label->font().family();
+    fontString=mapFont.family();
     qDebug() << text << ":" << length << " @ " << pt-1;
     while (length>label->width()-5){
         pt--; //start with i=default
@@ -240,10 +242,10 @@ void StarMapUI::setScaledText(QLabel* label, QString text, int maxpt){
         QFontMetricsF fm(font);
     //    length = fm.width(text);
         length = fm.maxWidth()*(text.length()+1);
-  //      qDebug() << "\tAt " << pt << " pt, length is " << length << "(" << fm.maxWidth() << "/char)";
- //       qDebug() << fm.boundingRect(text).width();
+        qDebug() << "\tAt " << pt << " pt, length is " << length << "(" << fm.maxWidth() << "/char)";
+        qDebug() << fm.boundingRect(text).width();
     }
-    QFont newFont = label->font();
+    QFont newFont = mapFont;
     newFont.setPointSize(pt);
     label->setFont(newFont);
     label->setText(text);
@@ -301,7 +303,7 @@ void StarMapUI::addPlayerMarkers(){
         mapScene->addLine(ptx, pty+h-1, ptx+1, pty+h, pen);
         mapScene->addLine(ptx+h, pty+h, ptx+h-1, pty+h+1, pen);
         mapScene->addLine(ptx+h-1, pty, ptx+h, pty+1, pen);*/
-        qDebug() << i++;
+        //qDebug() << i++;
         starMap->starListIterator++;
     }
 

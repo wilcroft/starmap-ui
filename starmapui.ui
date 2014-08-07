@@ -113,8 +113,9 @@ color: white;
     </property>
     <property name="font">
      <font>
-      <family>Lucida Console</family>
-      <pointsize>22</pointsize>
+      <family>Courier 10 Pitch</family>
+      <pointsize>18</pointsize>
+      <italic>false</italic>
      </font>
     </property>
     <property name="text">
@@ -151,8 +152,8 @@ color: white;
     </property>
     <property name="font">
      <font>
-      <family>Lucida Console</family>
-      <pointsize>16</pointsize>
+      <family>Serif</family>
+      <pointsize>14</pointsize>
      </font>
     </property>
     <property name="text">
@@ -216,8 +217,8 @@ color: white;
     </property>
     <property name="font">
      <font>
-      <family>Lucida Console</family>
-      <pointsize>16</pointsize>
+      <family>Serif</family>
+      <pointsize>12</pointsize>
      </font>
     </property>
     <property name="text">
@@ -433,7 +434,7 @@ color: white;
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>20</height>
+     <height>26</height>
     </rect>
    </property>
    <property name="styleSheet">

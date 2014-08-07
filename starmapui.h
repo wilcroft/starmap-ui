@@ -11,6 +11,7 @@
 #include <QInputDialog>
 #include <QMouseEvent>
 #include <QString>
+#include <QFont>
 #include <QFontMetrics>
 #include <QFontMetricsF>
 #include <QBrush>
@@ -50,6 +51,8 @@ private:
     QGraphicsScene* mapScene;
     QGraphicsPixmapItem* mapItem;
     QGraphicsView* mapView;
+
+    QFont mapFont;
 
     QGraphicsScene* starScene;
     QGraphicsPixmapItem* starItem;
