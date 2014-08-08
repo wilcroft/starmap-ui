@@ -43,11 +43,13 @@ StarMapUI::StarMapUI(QWidget *parent) :
     starItem = new QGraphicsPixmapItem;
     starScene = new QGraphicsScene;
     starScene->addItem(starItem);
+    ui->starDisplay->setScene(starScene);
 
     for (int i=0;i<5;i++){
         planetItem[i]=new QGraphicsPixmapItem;
         planetScene[i]= new QGraphicsScene;
         planetScene[i]->addItem(planetItem[i]);
+        planetViewPtr[i]->setScene(planetScene[i]);
     }
 
     count = 0;
@@ -132,25 +134,10 @@ void StarMapUI::mouseMoveEvent(QMouseEvent* event){
     ui->starLabel->setText(labelString);
 }*/
 
+
+// STAR DISPLAY UPDATER!!!
 bool StarMapUI::eventFilter(QObject *obj, QEvent *event){
-//    if (event->type() == QEvent::MouseMove){
-//        qDebug() << obj->objectName();
-//        qDebug() << "~~~~~ " << count;
-//        count++;
-//    }
-//    if (mapExists && event->type() == QEvent::MouseButtonPress){
-//        qDebug() << obj->objectName();
-//        qDebug() << "~~~~~ " << count;
-//        count++;
-//    }
     if (mapExists && event->type() == QEvent::MouseButtonPress && obj==ui->mapDisplay){
-//        qDebug() << obj->objectName();
-//        if (obj->objectName()==ui->mapDisplay->objectName())
-//            qDebug() << "MATCH";
-//        else
-//            qDebug() << "NOPE";
-//        if (obj==ui->mapDisplay)
-//            qDebug() << "SAME";
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
         int mx = mouseEvent->x();
         int my = mouseEvent->y();
@@ -191,34 +178,26 @@ bool StarMapUI::eventFilter(QObject *obj, QEvent *event){
         this->setScaledText(ui->starTypeLabel,typeString,30);
         this->setScaledText(ui->starSizeLabel,sizeString,30);
         starItem->setPixmap(QPixmap(imageString));
-        ui->starDisplay->setScene(starScene);
+
+        //add border for owner color
+        QPen starBorderPen;
+        if (star != nullptr){
+            rgb_t pcolor = getPlayerColor(star->getOwner());
+            starBorderPen.setColor(QColor::fromRgb(pcolor.r,pcolor.g,pcolor.b));
+        }
+        else{
+            starBorderPen.setColor("black");
+        }
+        starBorderPen.setWidth(5);
+        starScene->addRect(2,2,196,196,starBorderPen,Qt::NoBrush);
+
 
         for (int i=0; i<5;i++){
             //planetLabelPtr[i]->setText(planetString[i]);
             this->setScaledText(planetLabelPtr[i], planetString[i]);
             planetItem[i]->setPixmap(QPixmap(planetImageString[i]));
-            planetViewPtr[i]->setScene(planetScene[i]);
-        }/*
-        if (star!=nullptr){
-            while (starMap->getStar(mx/5-1,my/5)==star){
-                mx-=5;
-            }
-            while (starMap->getStar(mx/5,my/5-1)==star){
-                my-=5;
-            }
-            star = starMap->getStar(mx/5,my/5);
-            star->setOwner(STARMAPPLAYER_ONE);
-            rgb_t pcolor = getPlayerColor(star->getOwner());
-            QPen pen(QColor::fromRgb(pcolor.r,pcolor.g,pcolor.b));
-            pen.setWidth(1);
-            int rx,ry,rw,rh;
-            rx=mx-(mx%5)-2;
-            ry=my-(my%5)-2;
-            qDebug() << mouseEvent->x() << " to " << rx;
-            qDebug() << mouseEvent->y() << " to " << ry;
-            rw = rh = 3+5*((int)star->getSize());
-            mapScene->addRect(rx,ry,rw,rh,pen,Qt::NoBrush);
-        }*/
+ //           planetViewPtr[i]->setScene(planetScene[i]);
+        }
     }
     return false;
 }
@@ -236,7 +215,7 @@ void StarMapUI::setScaledText(QLabel* label, QString text, int maxpt){
     //fontString=label->font().family();
     fontString=mapFont.family();
     qDebug() << text << ":" << length << " @ " << pt-1;
-    while (length>label->width()-5){
+    while (length>label->width()){
         pt--; //start with i=default
         QFont font (fontString, pt);
         QFontMetricsF fm(font);
@@ -268,7 +247,7 @@ void StarMapUI::addPlayerMarkers(){
     starMap->starListIterator=starMap->begin();
     QPen pen;
     pen.setWidth(1);
-    int i=0;
+    //int i=0;
     while (starMap->starListIterator!= starMap->end()){
         int ptx, pty, w, h;
         ptx=(*(starMap->starListIterator))->getX()*5-2;
